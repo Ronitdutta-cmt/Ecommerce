@@ -130,7 +130,7 @@ app.post('/removeproduct' , async(req,res)=>{
         name : req.body.name 
     })
 })
-
+// new thing
 
 // to get all the pdts 
 app.get('/allproducts' , async(req, res)=>{
