@@ -45,8 +45,13 @@
     background: #FF4141;
 }
 .nav-login-cart{
-    width: 157px;
-    height: 58px ; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    min-width: 170px;
+    height: 58px ;
+    padding: 0 16px;
     outline: none;
     border: 1px solid #7a7a7a;
     border-radius: 75px;
@@ -55,8 +60,9 @@
 }
 
 .nav-login-cart button{
-    width: 157px ;
-    height:  58px;
+    width: auto;
+    min-width: 84px;
+    height:  42px;
     outline: none;
     border: 1px solid #7a7a7a;
     border-radius: 75px;
@@ -65,24 +71,42 @@
     font-weight: 500;    
     background: white;
     cursor: pointer;
+    padding: 0 16px;
 }
 
 .nav-login-cart button:active{  /*for onclick . */
     background: #f3f3f3 ;
 }
 
+.nav-cart-link{
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.nav-cart-link img{
+    width: 28px;
+    height: 28px;
+}
+
 .nav-cart-count{
-    height: 22px;
-    width: 22px;
-    display:  flex;
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    min-width: 20px;
+    height: 20px;
+    display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: -35px;
-    margin-left: -55px ;    
-    border-radius: 11px;
-    font-size: 14px;
-    background: red;
+    padding: 0 5px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    background: #ff4141;
     color: white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
 }
 /* making it responsive  */
 /* hiding the dropdown icon by defuault  */

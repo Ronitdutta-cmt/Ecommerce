@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useRef, useState } from 'react'
 
 import logo from '../Assets/Frontend_Assets/logo.png'
 import cart_logo from '../Assets/Frontend_Assets/cart_icon.png'
@@ -37,9 +37,11 @@ const Navbar = () => {
         </ul>
 
         <div className="nav-login-cart">
-            <Link to='/login'></Link><button>Login</button>
-            <Link to='/cart'></Link><img src={cart_logo} alt="" />
-            <div className="nav-cart-count"> { getTotalCartItems()} </div>
+            <Link to='/login'><button>Login</button></Link>
+            <Link to='/cart' className="nav-cart-link">
+                <img src={cart_logo} alt="Cart" />
+                <span className="nav-cart-count">{getTotalCartItems()}</span>
+            </Link>
         </div>
     
     </div>

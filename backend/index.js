@@ -6,22 +6,30 @@ const jwt = require("jsonwebtoken") ;
 const multer = require("multer") ; 
 const path = require("path") ; //using this we can get access to backend directory thru express app . 
 const cors = require("cors") ;
-const { stringify } = require("querystring");
+const { getProducts, addFallbackProduct, removeFallbackProduct, getNextProductId } = require('./productStore');
 
 // thru this all the request will be automatically parsed to json . 
 app.use(express.json()) ; 
 app.use(cors()) ; // using this out react app will connnect to exprss app  on port:4000 . 
 
-//connection with atlas using compass .
-mongoose.connect("mongodb+srv://RonitDutta:databasekapasswordh@cluster0.atdc9wp.mongodb.net/e-commerce") ; 
+let dbReady = false;
+let dbError = null;
 
-//APi endpoint 
+async function connectDatabase() {
+    try {
+        await mongoose.connect("mongodb+srv://RonitDutta:databasekapasswordh@cluster0.atdc9wp.mongodb.net/e-commerce", {
+            serverSelectionTimeoutMS: 5000,
+            socketTimeoutMS: 5000,
+        });
+        dbReady = true;
+        console.log("MongoDB connected");
+    } catch (error) {
+        dbError = error;
+        console.warn("MongoDB connection failed, continuing with fallback storage:", error.message);
+    }
+}
 
-app.get("/" , (req, res)=>{
-    res.send("express app running") ; 
-  })
-
-
+connectDatabase();
   //image storage engine 
   // see explaination of this . 
   const storage = multer.diskStorage({
@@ -86,66 +94,63 @@ const Product = mongoose.model("Product" , {
 })
 
 app.post('/addproduct' , async(req ,res)=>{
+    try {
+        if (dbReady) {
+            const products = await Product.find({});
+            const id = getNextProductId(products);
+            const product = new Product({
+                id,
+                name:req.body.name ,
+                image:req.body.image , 
+                category:req.body.category ,
+                new_price:req.body.new_price ,
+                old_price:req.body.old_price 
+            });
+            await product.save();
+            console.log("saved in db");
+            return res.json({ success:true, name:req.body.name });
+        }
 
-    // logic for auto-gen of id 
-    let products = await Product.find({})  ;  
-    let id ;
-    if(products.length > 0)
-    {
-        let last_product_array = products.slice(-1) ; // will give last updated pdt .
-        let last_product = last_product_array[0] ; 
-        id = last_product.id + 1 ; 
+        const product = addFallbackProduct(getProducts(), req.body);
+        return res.json({ success:true, name: product.name });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success:false, message:error.message });
     }
-    else{
-        id =1 ; 
-    }
-
-
-
-    const product = new Product({
-        id:id ,
-        name:req.body.name ,
-        image:req.body.image , 
-        category:req.body.category ,
-        new_price:req.body.new_price ,
-        old_price:req.body.old_price 
-    });
-    console.log(product) ; 
-    await product.save() ; //saving in db takes time , so using await .
-    console.log("saved in db ")  ; 
-
-    res.json({ // msg for front-end . 
-        success:true ,
-        name : req.body.name 
-    })
 })
 
 
 // for del pdts 
 app.post('/removeproduct' , async(req,res)=>{
-    await Product.findOneAndDelete({id:req.body.id}); 
-    console.log("removed") ; 
-    res.json({
-        success:true , 
-        name : req.body.name 
-    })
+    try {
+        if (dbReady) {
+            await Product.findOneAndDelete({id:req.body.id});
+            console.log("removed");
+            return res.json({ success:true, name:req.body.name });
+        }
+
+        removeFallbackProduct(getProducts(), Number(req.body.id));
+        return res.json({ success:true, name:req.body.name });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success:false, message:error.message });
+    }
 })
 // new thing
 
 // to get all the pdts 
 app.get('/allproducts' , async(req, res)=>{
-    let products =  await Product.find({}) ;  // this will get all the pdts . 
-    console.log("all pdts fetched ") ; 
-    res.send(products) ; 
-})
+    try {
+        if (dbReady) {
+            const products = await Product.find({});
+            console.log("all pdts fetched");
+            return res.send(products);
+        }
 
-
-app.listen(port , (error)=>{
-    if(!error) // if no error 
-    {
-        console.log("Server running on port : " + port ) ;
-    }
-    else{
-        console.log("Error : "+ error) ; 
+        console.log("all pdts fetched from fallback store");
+        return res.send(getProducts());
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success:false, message:error.message });
     }
 }) 
