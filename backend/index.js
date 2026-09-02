@@ -155,3 +155,7 @@ app.get('/allproducts' , async(req, res)=>{
         return res.status(500).json({ success:false, message:error.message });
     }
 }) 
+
+app.listen(port, '0.0.0.0', () => {
+    console.log(`Server running on port ${port}`);
+});
