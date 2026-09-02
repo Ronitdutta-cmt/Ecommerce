@@ -32,7 +32,7 @@ const AddProduct = () => {
       formData.append('product' , image) ; 
 
       //now sending this form data to api . 
-      await fetch('http:localhost:4000/upload' , { method:'POST' ,
+      await fetch('https://lifestyle-glorious-bee.abasthan.app/upload' , { method:'POST' ,
                                                    headers:{
                                                     Accept:'application/json'} ,
                                                     body:formData,
@@ -42,7 +42,7 @@ const AddProduct = () => {
             {
               product.image = responseData.image_url ;
               console.log(product)  ; 
-              await fetch('http://localhost:4000/addproduct',{
+              await fetch('https://lifestyle-glorious-bee.abasthan.app/addproduct',{
                 method:'POST',
                 headers:{
                         Accept:'application/json',
