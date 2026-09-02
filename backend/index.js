@@ -1,4 +1,4 @@
-const port = 4000 ; 
+const port = process.env.PORT || 4000; 
 const express = require("express")  ;
 const app = express() ; 
 const mongoose = require("mongoose")  ; 
@@ -17,10 +17,11 @@ let dbError = null;
 
 async function connectDatabase() {
     try {
-        await mongoose.connect("mongodb+srv://RonitDutta:databasekapasswordh@cluster0.atdc9wp.mongodb.net/e-commerce", {
+        await mongoose.connect(process.env.MONGO_URI, {           
             serverSelectionTimeoutMS: 5000,
             socketTimeoutMS: 5000,
         });
+
         dbReady = true;
         console.log("MongoDB connected");
     } catch (error) {
